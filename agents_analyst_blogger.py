@@ -20,7 +20,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 load_dotenv()
 
-VK_ACCESS_TOKEN = os.getenv("VK_ACCESS_TOKEN") or "vk1.a.XXX"
+VK_ACCESS_TOKEN = os.getenv("VK_ACCESS_TOKEN")
 VK_API_VERSION = os.getenv("VK_API_VERSION")
 VK_GROUP_SCREEN_NAME = os.getenv("VK_GROUP_SCREEN_NAME")
 VK_GROUP_ID = os.getenv("VK_GROUP_ID")  # Твоя группа ВК
@@ -129,6 +129,7 @@ class VKAnalyticsAgent:
             posts_summary.append(
                 like_str
             )
+        print('---------------------------------------')
         if datetime.now().weekday() == 2:
             
             with open(f'data/week_{date_today}.txt', 'w', encoding='utf-8') as f:
@@ -193,7 +194,7 @@ class VillageContentGenerator:
         self.analytics_agent = analytics_agent
 
         _genai.configure(api_key=gemini_api_key)
-        self.model = _genai.GenerativeModel('gemini-1.5-flash')
+        self.model = _genai.GenerativeModel('gemini-2.0-flash')
 
         self.system_prompt = """
         Ты — блоггер из деревни Иван. Пиши теплые, жизненные посты без пафоса.
@@ -221,7 +222,7 @@ class VillageContentGenerator:
         try:
             
             response = client_.models.generate_content(
-                model="gemini-2.0-flash-preview-image-generation",
+                model="gemini-2.0-flash",
                 contents=prompt,
                 config=genai.types.GenerateContentConfig(
                 response_modalities=['TEXT', 'IMAGE']
@@ -437,12 +438,12 @@ def start_scheduler():
         gemini_api_key=GEMINI_API_KEY,
         analytics_agent=vk_agent
     )
-
+    # blogger.run_posting_cycle()
     scheduler = BackgroundScheduler(timezone=timezone('Europe/Moscow'))
 
     # Расписание: утром, днем, вечером по будням
     scheduler.add_job(blogger.run_posting_cycle, 'cron', day_of_week='mon-fri', hour=7)
-    scheduler.add_job(blogger.run_posting_cycle, 'cron', day_of_week='mon-fri', hour=14)
+    scheduler.add_job(blogger.run_posting_cycle, 'cron', day_of_week='mon-fri', hour=13)
     scheduler.add_job(blogger.run_posting_cycle, 'cron', day_of_week='mon-fri', hour=19)
 
     # В выходные только утром
@@ -460,3 +461,15 @@ def start_scheduler():
 
 if __name__ == "__main__":
     start_scheduler()
+    # vk_agent = VKAnalyticsAgent(
+    #     access_token=VK_ACCESS_TOKEN,
+    #     api_version=VK_API_VERSION,
+    #     group_screen_name=VK_GROUP_SCREEN_NAME,
+    #     gemini_api_key=GEMINI_API_KEY
+    # )
+
+    # blogger = VillageContentGenerator(
+    #     gemini_api_key=GEMINI_API_KEY,
+    #     analytics_agent=vk_agent
+    # )
+    # blogger.run_posting_cycle()

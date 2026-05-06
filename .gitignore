@@ -20,3 +20,4 @@ fine-tuned-bert-22092023/
 *.gif
 *.MOD
 .env
+*.log

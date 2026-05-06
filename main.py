@@ -41,7 +41,7 @@ class VillageContentGenerator:
             # Try different ways to initialize the model based on library version
             try:
                 # New version (1.0.0+)
-                self.model = genai.GenerativeModel('gemini-1.5-flash')
+                self.model = genai.GenerativeModel('gemini-2.0-flash')
                 logger.info("Gemini AI успешно инициализирован (новая версия)")
             except AttributeError:
                 try:
